@@ -1,0 +1,38 @@
+import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
+import orderRoutes from './routes/orderRoutes';
+import cors from 'cors';
+import userRoutes from './routes/userRoutes';
+import supplierRoutes from './routes/supplierRoutes';
+import productRoutes from './routes/productRoutes';
+import budgetRoutes from './routes/budgetRoutes';
+import ragRoutes from './routes/ragRoutes'
+import sql from './db';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use('/orders', orderRoutes);
+app.use('/users', userRoutes);
+app.use('/suppliers', supplierRoutes);
+app.use('/products', productRoutes);
+app.use('/budgets', budgetRoutes);
+app.use('/api/rag', ragRoutes)
+app.get('/health', (_req, res) => {
+  res.json({status: 'ok'})
+})
+const startServer = async () => {
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'Pending'`;
+  await sql`UPDATE orders SET status = CASE WHEN received THEN 'Received' ELSE 'Pending' END WHERE status = 'Pending'`;
+  app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
+};
+
+startServer().catch((error) => {
+  console.error('Failed to initialize order status:', error);
+  process.exitCode = 1;
+});
+
+export default app
