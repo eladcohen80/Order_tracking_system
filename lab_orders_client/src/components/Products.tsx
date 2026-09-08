@@ -97,7 +97,7 @@ export default function Products() {
                         <button type="button" onClick={() => handleSort('product_name')}>Product Name{getSortIndicator('product_name')}</button>
                         <button type="button" onClick={() => handleSort('cat_number')}>Catalog Number{getSortIndicator('cat_number')}</button>
                         <button type="button" onClick={() => handleSort('supplier')}>Supplier{getSortIndicator('supplier')}</button>
-                        <button type="button" onClick={() => handleSort('price_in_last_order')}>Last Price{getSortIndicator('price_in_last_order')}</button>
+                        <button type="button" onClick={() => handleSort('price_in_last_order')}>Last Price/Unit{getSortIndicator('price_in_last_order')}</button>
                     </div>
                     {sortedProducts.map((product) => (
                         <div className="product-row" key={product.product_id}>
