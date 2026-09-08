@@ -16,7 +16,7 @@ const TABLES = [
   {
     name: 'products',
     id: 'product_id',
-    columns: 'product_id, product_name, description, cat_number, supplier',
+    columns: 'product_id, product_name,  cat_number, supplier, price_in_last_order',
     text: (row) => `מוצר: ${row.product_name}. תיאור: ${row.description || ''}. מק"ט: ${row.cat_number || ''}. ספק: ${row.supplier || ''}.`,
   },
   {

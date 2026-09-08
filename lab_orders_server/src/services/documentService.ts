@@ -16,7 +16,7 @@ import {
 // ============================================
 
 export type DocumentRow = {
-  document_id: number
+  document_id: string
   title: string
   content: string
 }
@@ -101,11 +101,13 @@ export async function upsertDocument(
 // ============================================
 // Vector Search
 //
+// החיפוש מתבצע ישירות מול עמודות embedding_dimensions
+// בטבלאות העסק (orders, products, suppliers, budgets).
 // <=> הוא אופרטור של pgvector.
 // הוא מחשב Distance בין שני Vectors.
 // Distance קטן יותר = קרוב יותר במשמעות.
 //
-// limit     = Top K   (כמה מסמכים להחזיר)
+// limit     = Top K   (כמה רשומות להחזיר)
 // threshold = מרחק מקסימלי שעדיין נחשב רלוונטי
 // ============================================
 
@@ -124,22 +126,47 @@ export async function searchDocuments(
     toVectorString(embedding)
 
   const documents = await sql`
-    SELECT
-      document_id,
-      title,
-      content,
-      embedding <=> ${vector}::vector
-        AS distance
+    SELECT * FROM (
+      SELECT
+        ('order:' || order_id) AS document_id,
+        ('Order ' || order_id) AS title,
+        CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Total NIS: ', total_price_nis, '. Received: ', received, '. Comments: ', comments, '.') AS content,
+        embedding_dimensions <=> ${vector}::vector AS distance
+      FROM orders
+      WHERE embedding_dimensions IS NOT NULL
 
-    FROM documents
+      UNION ALL
 
-    WHERE
-      embedding <=> ${vector}::vector
-        < ${threshold}
+      SELECT
+        ('product:' || product_id) AS document_id,
+        ('Product: ' || product_name) AS title,
+        CONCAT('Product: ', product_name, '. Catalog number: ', cat_number, '. Supplier: ', supplier, '.') AS content,
+        embedding_dimensions <=> ${vector}::vector AS distance
+      FROM products
+      WHERE embedding_dimensions IS NOT NULL
 
-    ORDER BY
-      embedding <=> ${vector}::vector
+      UNION ALL
 
+      SELECT
+        ('supplier:' || supplier_id) AS document_id,
+        ('Supplier: ' || supplier_name) AS title,
+        CONCAT('Supplier: ', supplier_name, '. Contact: ', contact_person, '. Email: ', email, '. Phone: ', phone, '.') AS content,
+        embedding_dimensions <=> ${vector}::vector AS distance
+      FROM suppliers
+      WHERE embedding_dimensions IS NOT NULL
+
+      UNION ALL
+
+      SELECT
+        ('budget:' || budget_id) AS document_id,
+        ('Budget: ' || budget_name) AS title,
+        CONCAT('Budget: ', budget_name, '. Balance: ', budget_balance, '.') AS content,
+        embedding_dimensions <=> ${vector}::vector AS distance
+      FROM budgets
+      WHERE embedding_dimensions IS NOT NULL
+    ) AS all_documents
+    WHERE distance < ${threshold}
+    ORDER BY distance
     LIMIT ${limit}
   `
 
@@ -150,13 +177,37 @@ export async function searchDocuments(
 export async function getAllDocuments(): Promise<DocumentRow[]> {
 
   const documents = await sql`
-    SELECT
-      document_id,
-      title,
-      content
+    SELECT * FROM (
+      SELECT
+        ('order:' || order_id) AS document_id,
+        ('Order ' || order_id) AS title,
+        CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Total NIS: ', total_price_nis, '. Received: ', received, '. Comments: ', comments, '.') AS content
+      FROM orders
 
-    FROM documents
+      UNION ALL
 
+      SELECT
+        ('product:' || product_id) AS document_id,
+        ('Product: ' || product_name) AS title,
+        CONCAT('Product: ', product_name, '. Catalog number: ', cat_number, '. Supplier: ', supplier, '.') AS content
+      FROM products
+
+      UNION ALL
+
+      SELECT
+        ('supplier:' || supplier_id) AS document_id,
+        ('Supplier: ' || supplier_name) AS title,
+        CONCAT('Supplier: ', supplier_name, '. Contact: ', contact_person, '. Email: ', email, '. Phone: ', phone, '.') AS content
+      FROM suppliers
+
+      UNION ALL
+
+      SELECT
+        ('budget:' || budget_id) AS document_id,
+        ('Budget: ' || budget_name) AS title,
+        CONCAT('Budget: ', budget_name, '. Balance: ', budget_balance, '.') AS content
+      FROM budgets
+    ) AS all_documents
     ORDER BY document_id
   `
 
@@ -167,8 +218,12 @@ export async function getAllDocuments(): Promise<DocumentRow[]> {
 export async function countDocuments(): Promise<number> {
 
   const result = await sql`
-    SELECT COUNT(*)::int AS count
-    FROM documents
+    SELECT (
+      (SELECT COUNT(*) FROM orders) +
+      (SELECT COUNT(*) FROM products) +
+      (SELECT COUNT(*) FROM suppliers) +
+      (SELECT COUNT(*) FROM budgets)
+    )::int AS count
   `
 
   return (result[0] as { count: number }).count

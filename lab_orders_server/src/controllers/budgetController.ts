@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import sql from '../db';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { deleteDocumentBySourceKey, syncBudgetDocument } from '../services/ragSyncService';
 
 export const getBudgets = async (req: Request, res: Response) => {
   try {
@@ -34,6 +35,7 @@ export const createBudget = async (req: AuthRequest, res: Response) => {
       VALUES (${name}, ${balance})
         RETURNING *;
     `;
+    await syncBudgetDocument(result[0].budget_id);
     res.status(201).json(result[0]);
   } catch (error) {
     console.error(error);
@@ -55,6 +57,7 @@ export const updateBudget = async (req: AuthRequest, res: Response) => {
     if (result.length === 0) {
       return res.status(404).json({ error: 'Budget not found' });
     }
+    await syncBudgetDocument(parsedId);
     res.json(result[0]);
   } catch (error) {
     console.error(error);
@@ -74,6 +77,7 @@ export const deleteBudget = async (req: AuthRequest, res: Response) => {
     if (result.length === 0) {
       return res.status(404).json({ error: 'Budget not found' });
     }   
+    await deleteDocumentBySourceKey(`budget:${parsedId}`);
     res.json({ message: 'Budget deleted successfully' });
   } catch (error) {
     console.error(error);

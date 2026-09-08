@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import sql from '../db';
 import { AuthRequest } from "../middleware/authMiddleware";
+import { deleteDocumentBySourceKey, syncOrderDocument, syncProductDocumentByKey } from "../services/ragSyncService";
 
 const isCurrentUserAdmin = async (userId?: number) => {
   if (!userId) {
@@ -124,6 +125,8 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       ) RETURNING *
     `;
     await addProductIfMissing(description, cat_number, supplier, parsedPrice, currency);
+    await syncOrderDocument(result[0].order_id);
+    await syncProductDocumentByKey(description, cat_number, supplier);
     res.status(201).json(result[0]);
   } catch (error: any) {
     console.error('Create order error:', error);
@@ -145,6 +148,8 @@ export const updateOrder = async (req: AuthRequest, res: Response) => {
     }
 
     await addProductIfMissing(description, cat_number, supplier, Number(price) || 0, currency);
+    await syncOrderDocument(result[0].order_id);
+    await syncProductDocumentByKey(description, cat_number, supplier);
     res.json(result[0]);
     } catch (error) {
     console.error(error);
@@ -162,6 +167,7 @@ export const deleteOrder = async (req: AuthRequest, res: Response) => {
     if (result.length === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
+    await deleteDocumentBySourceKey(`order:${id}`);
     res.json({ message: 'Order deleted successfully' });
     } catch (error) {
     console.error(error);
