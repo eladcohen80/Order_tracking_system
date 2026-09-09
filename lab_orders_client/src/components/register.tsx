@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import './Auth.css';
-import { API_BASE_URL } from '../services/api';
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -15,7 +14,7 @@ export default function Register() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try {
-            const response = await fetch(`${API_BASE_URL}/users/register`, {
+            const response = await fetch('http://localhost:3000/users/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -26,19 +25,16 @@ export default function Register() {
                     password: password
                 })
             });
-            const responseText = await response.text();
-            const data = responseText
-                ? JSON.parse(responseText)
-                : {};
+            const data = await response.json();
             if (!response.ok) {
-                setMessage(data.error || `Request failed (${response.status})`);
+                setMessage(data.error || 'Registration failed');
                 return;
             }
             alert('Registration successful');
             navigate('/login');
         } catch (error) {
             console.error(error);
-            setMessage(error instanceof Error ? error.message : 'Server error');
+            setMessage('Server error');
         }
     }
 

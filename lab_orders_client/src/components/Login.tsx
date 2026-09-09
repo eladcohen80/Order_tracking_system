@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Auth.css'
-import { API_BASE_URL } from '../services/api'
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,7 +16,7 @@ export default function Login() {
 
     try {
 
-      const response = await fetch(`${API_BASE_URL}/users/login`, {
+      const response = await fetch('http://localhost:3000/users/login', {
           method: 'POST',
 
           headers: {
@@ -31,15 +30,12 @@ export default function Login() {
         }
       )
 
-      const responseText = await response.text()
-      const data = responseText
-        ? JSON.parse(responseText)
-        : {}
+      const data = await response.json()
 
       if (!response.ok) {
 
         setMessage(
-          data.error || `Request failed (${response.status})`
+          data.error || 'Login failed'
         )
 
         return
@@ -57,7 +53,7 @@ export default function Login() {
 
       console.error(error)
 
-      setMessage(error instanceof Error ? error.message : 'Server error')
+      setMessage('Server error')
     }
   }
 
