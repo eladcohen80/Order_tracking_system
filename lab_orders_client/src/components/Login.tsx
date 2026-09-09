@@ -31,12 +31,15 @@ export default function Login() {
         }
       )
 
-      const data = await response.json()
+      const responseText = await response.text()
+      const data = responseText
+        ? JSON.parse(responseText)
+        : {}
 
       if (!response.ok) {
 
         setMessage(
-          data.error || 'Login failed'
+          data.error || `Request failed (${response.status})`
         )
 
         return
@@ -54,7 +57,7 @@ export default function Login() {
 
       console.error(error)
 
-      setMessage('Server error')
+      setMessage(error instanceof Error ? error.message : 'Server error')
     }
   }
 
