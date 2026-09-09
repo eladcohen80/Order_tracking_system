@@ -1,6 +1,6 @@
 import type { Order } from "../types/Order";
 
-const API_URL = "http://localhost:3000/orders";
+const API_URL = "https://labordersserver.vercel.app/orders";
 
 const getHeaders = () => {
     const token = localStorage.getItem("token");
