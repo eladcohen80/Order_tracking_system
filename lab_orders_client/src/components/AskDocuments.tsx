@@ -56,7 +56,7 @@ function AskDocuments() {
     useState<PanelPosition | null>(null)
 
   const [isCollapsed, setIsCollapsed] =
-    useState(false)
+    useState(true)
 
   const [loading, setLoading] =
     useState(false)
