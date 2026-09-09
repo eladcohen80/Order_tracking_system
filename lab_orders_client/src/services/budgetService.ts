@@ -1,6 +1,8 @@
 import type { Budget } from "../types/Budget";
 
-const API_URL = 'https://labordersserver.vercel.app/budgets';
+import { API_BASE_URL } from './api';
+
+const API_URL = `${API_BASE_URL}/budgets`;
 
 const getHeaders = () => {
     const token = localStorage.getItem('token');

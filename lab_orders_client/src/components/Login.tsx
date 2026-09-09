@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Auth.css'
+import { API_BASE_URL } from '../services/api'
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ export default function Login() {
 
     try {
 
-      const response = await fetch('http://localhost:3000/users/login', {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
           method: 'POST',
 
           headers: {

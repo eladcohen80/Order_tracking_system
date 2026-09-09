@@ -1,6 +1,8 @@
 import type { Product } from '../types/Product';
 
-const API_URL = 'https://labordersserver.vercel.app/products';
+import { API_BASE_URL } from './api';
+
+const API_URL = `${API_BASE_URL}/products`;
 
 const getHeaders = () => {
     const token = localStorage.getItem('token');

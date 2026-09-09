@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import './Auth.css';
+import { API_BASE_URL } from '../services/api';
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -14,7 +15,7 @@ export default function Register() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:3000/users/register', {
+            const response = await fetch(`${API_BASE_URL}/users/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

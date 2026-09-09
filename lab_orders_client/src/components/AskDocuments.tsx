@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './AskDocuments.css'
+import { API_BASE_URL } from '../services/api'
 
 // ============================================
 // AskDocuments
@@ -8,8 +9,7 @@ import './AskDocuments.css'
 // להציג למשתמש Answer + Sources.
 // ============================================
 
-const API_URL =
-  'http://localhost:3000/api/rag/ask'
+const API_URL = `${API_BASE_URL}/api/rag/ask`
 
 type RagResponse = {
   answer: string
@@ -56,7 +56,7 @@ function AskDocuments() {
     useState<PanelPosition | null>(null)
 
   const [isCollapsed, setIsCollapsed] =
-    useState(false)
+    useState(true)
 
   const [loading, setLoading] =
     useState(false)

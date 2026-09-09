@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/app.ts",
-    "start": "node dist/app.js",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
     "build": "tsc",
     "init:rag": "npm run build && node dist/scripts/initRagSchema.js",
     "sync:rag": "npm run init:rag && node dist/scripts/syncRagDocuments.js",
