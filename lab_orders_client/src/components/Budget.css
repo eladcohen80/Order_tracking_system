@@ -125,6 +125,7 @@
 .budget-table td:last-child {
   width: 1%;
   white-space: nowrap;
+  text-align: right;
 }
 
 .budget-table button {

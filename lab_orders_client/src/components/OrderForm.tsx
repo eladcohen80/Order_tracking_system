@@ -32,8 +32,7 @@ export default function OrderForm() {
         price: 0,
         currency: '',
         total_price_nis: 0,
-        received: false,
-        status: 'Pending',
+        status: 'pending',
         comments: '',
     });
 
@@ -299,10 +298,10 @@ export default function OrderForm() {
                         <div className="form-group checkbox-card">
                             <label>
                                 <span>Status</span>
-                                <select name="status" value={order.status} onChange={(e) => setOrder({ ...order, status: e.target.value as Order['status'], received: e.target.value === 'Received' })}>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Received">Received</option>
-                                    <option value="Canceled">Canceled</option>
+                                <select name="status" value={order.status} onChange={(e) => setOrder({ ...order, status: e.target.value as Order['status'] })}>
+                                    <option value="pending">Pending</option>
+                                    <option value="received">Received</option>
+                                    <option value="canceled">Canceled</option>
                                 </select>
                             </label>
                         </div>

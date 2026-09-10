@@ -34,8 +34,8 @@ const TABLES = [
   {
     name: 'orders',
     id: 'order_id',
-    columns: 'order_id, order_date, description, cat_number, quote_number, po_number, supplier, budget, amount, price, currency, total_price_nis, received, comments',
-    text: (row) => `הזמנה מתאריך: ${row.order_date}. תיאור: ${row.description || ''}. מק"ט: ${row.cat_number || ''}. מספר הצעת מחיר: ${row.quote_number || ''}. מספר PO: ${row.po_number || ''}. ספק: ${row.supplier || ''}. תקציב: ${row.budget || ''}. כמות: ${row.amount ?? ''}. מחיר יחידה: ${row.price ?? ''} ${row.currency || ''}. סך הכל בש"ח: ${row.total_price_nis ?? ''}. סטטוס התקבל: ${row.received ? 'כן' : 'לא'}. הערות: ${row.comments || ''}.`,
+    columns: 'order_id, order_date, description, cat_number, quote_number, po_number, supplier, budget, amount, price, currency, total_price_nis, status, comments',
+    text: (row) => `הזמנה מתאריך: ${row.order_date}. תיאור: ${row.description || ''}. מק"ט: ${row.cat_number || ''}. מספר הצעת מחיר: ${row.quote_number || ''}. מספר PO: ${row.po_number || ''}. ספק: ${row.supplier || ''}. תקציב: ${row.budget || ''}. כמות: ${row.amount ?? ''}. מחיר יחידה: ${row.price ?? ''} ${row.currency || ''}. סך הכל בש"ח: ${row.total_price_nis ?? ''}. סטטוס: ${row.status || ''}. הערות: ${row.comments || ''}.`,
   },
 ];
 

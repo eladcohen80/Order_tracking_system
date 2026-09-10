@@ -248,6 +248,7 @@
 
 .order-actions {
   display: flex;
+  justify-self: end;
   width: max-content;
   gap: 0.5rem;
   white-space: nowrap;

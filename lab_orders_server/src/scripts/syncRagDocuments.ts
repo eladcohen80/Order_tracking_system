@@ -37,7 +37,7 @@ const sourceQueries = [
     SELECT
       'order:' || order_id AS source_key,
       'Order ' || order_id AS title,
-      CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Total NIS: ', total_price_nis, '. Received: ', received, '. Comments: ', comments, '.') AS content
+      CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Total NIS: ', total_price_nis, '. Status: ', status, '. Comments: ', comments, '.') AS content
     FROM orders
   `
 ]

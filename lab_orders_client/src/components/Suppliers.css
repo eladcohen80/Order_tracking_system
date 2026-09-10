@@ -158,6 +158,7 @@
 .supplier-row .supplier-column:last-child {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.5rem;
   overflow: visible;
   white-space: nowrap;

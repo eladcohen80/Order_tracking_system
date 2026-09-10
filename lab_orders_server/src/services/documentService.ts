@@ -130,7 +130,7 @@ export async function searchDocuments(
       SELECT
         ('order:' || order_id) AS document_id,
         ('Order ' || order_id) AS title,
-        CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Total NIS: ', total_price_nis, '. Received: ', received, '. Comments: ', comments, '.') AS content,
+        CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Status: ', status, '. Comments: ', comments, '.') AS content,
         embedding_dimensions <=> ${vector}::vector AS distance
       FROM orders
       WHERE embedding_dimensions IS NOT NULL
@@ -181,7 +181,7 @@ export async function getAllDocuments(): Promise<DocumentRow[]> {
       SELECT
         ('order:' || order_id) AS document_id,
         ('Order ' || order_id) AS title,
-        CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Total NIS: ', total_price_nis, '. Received: ', received, '. Comments: ', comments, '.') AS content
+        CONCAT('Order date: ', order_date, '. Description: ', description, '. Catalog number: ', cat_number, '. Quote number: ', quote_number, '. PO number: ', po_number, '. Supplier: ', supplier, '. Budget: ', budget, '. Quantity: ', amount, '. Unit price: ', price, ' ', currency, '. Status: ', status, '. Comments: ', comments, '.') AS content
       FROM orders
 
       UNION ALL

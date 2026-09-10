@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import './Orders.css';
 
-type SortKey = 'order_date' | 'description' | 'supplier' | 'budget' | 'received';
+type SortKey = 'order_date' | 'description' | 'supplier' | 'budget' | 'status';
 type SortDirection = 'ascending' | 'descending';
 const ORDERS_PER_PAGE = 50;
 
@@ -57,7 +57,7 @@ export default function Orders() {
             order.budget,
             order.currency,
             order.comments,
-            order.received ? 'received' : 'pending',
+            order.status,
             order.order_date,
         ].some((value) => String(value ?? '').toLowerCase().includes(normalizedSearchTerm));
         return matchesDate && matchesSearch;
@@ -68,8 +68,8 @@ export default function Orders() {
 
         if (sortKey === 'order_date') {
             comparison = new Date(firstOrder.order_date).getTime() - new Date(secondOrder.order_date).getTime();
-        } else if (sortKey === 'received') {
-            comparison = Number(firstOrder.received) - Number(secondOrder.received);
+        } else if (sortKey === 'status') {
+            comparison = firstOrder.status.localeCompare(secondOrder.status);
         } else {
             comparison = firstOrder[sortKey].localeCompare(secondOrder[sortKey]);
         }
@@ -107,7 +107,7 @@ export default function Orders() {
         setEditingOrder({
             ...order,
             order_date: new Date(order.order_date).toISOString().split('T')[0],
-            status: order.status || (order.received ? 'Received' : 'Pending'),
+            status: order.status,
         });
     }
 
@@ -145,7 +145,7 @@ export default function Orders() {
             Price: order.price,
             Currency: order.currency,
             'Total (NIS)': order.total_price_nis,
-            Status: order.status || (order.received ? 'Received' : 'Pending'),
+            Status: order.status,
             Comments: order.comments,
         })));
         const workbook = XLSX.utils.book_new();
@@ -239,7 +239,7 @@ export default function Orders() {
                         <button type="button" className="sort-button" onClick={() => handleSort('supplier')} aria-sort={sortKey === 'supplier' ? sortDirection : 'none'}>Supplier{getSortIndicator('supplier')}</button>
                         <button type="button" className="sort-button" onClick={() => handleSort('budget')} aria-sort={sortKey === 'budget' ? sortDirection : 'none'}>Budget{getSortIndicator('budget')}</button>
                         <span className="column-header">Total price(ILS)</span>
-                        <button type="button" className="sort-button" onClick={() => handleSort('received')} aria-sort={sortKey === 'received' ? sortDirection : 'none'}>Status{getSortIndicator('received')}</button>
+                        <button type="button" className="sort-button" onClick={() => handleSort('status')} aria-sort={sortKey === 'status' ? sortDirection : 'none'}>Status{getSortIndicator('status')}</button>
                         <span className="actions-header">Actions</span>
                     </div>
                     {visibleOrders.map((order) => (
@@ -255,8 +255,8 @@ export default function Orders() {
                                     ? `₪${Number(order.total_price_nis).toLocaleString('en-US')}`
                                     : '-'}
                             </span>
-                            <span className={`order-status order-status-${(order.status || (order.received ? 'Received' : 'Pending')).toLowerCase()}`}>
-                                {order.status || (order.received ? 'Received' : 'Pending')}
+                            <span className={`order-status order-status-${order.status}`}>
+                                {order.status}
                             </span>
                             <div className="order-actions">
                                 <button type="button" className="details-button" onClick={() => setSelectedOrder(order)}>
@@ -319,9 +319,9 @@ export default function Orders() {
                                 <label>Total (NIS)<input type="number" name="total_price_nis" value={editingOrder.total_price_nis} onChange={handleEditChange} /></label>
                                 <fieldset className="status-field">
                                     <legend>Status</legend>
-                                    {(['Pending', 'Received', 'Canceled'] as const).map((status) => (
+                                    {(['pending', 'received', 'canceled'] as const).map((status) => (
                                         <label key={status} className="status-option">
-                                            <input type="radio" name="status" value={status} checked={editingOrder.status === status} onChange={() => setEditingOrder({ ...editingOrder, status, received: status === 'Received' })} />
+                                            <input type="radio" name="status" value={status} checked={editingOrder.status === status} onChange={() => setEditingOrder({ ...editingOrder, status })} />
                                             {status}
                                         </label>
                                     ))}
@@ -342,7 +342,7 @@ export default function Orders() {
                                     <div><dt>Amount</dt><dd>{selectedOrder.amount}</dd></div>
                                     <div><dt>Price</dt><dd>{selectedOrder.price} {selectedOrder.currency}</dd></div>
                                     <div><dt>Total (NIS)</dt><dd>{selectedOrder.total_price_nis}</dd></div>
-                                    <div className="order-detail-status"><dt>Status</dt><dd><span className={`order-status order-status-${(selectedOrder.status || (selectedOrder.received ? 'Received' : 'Pending')).toLowerCase()}`}>{selectedOrder.status || (selectedOrder.received ? 'Received' : 'Pending')}</span></dd></div>
+                                    <div className="order-detail-status"><dt>Status</dt><dd><span className={`order-status order-status-${selectedOrder.status}`}>{selectedOrder.status}</span></dd></div>
                                     <div className="order-detail-comments"><dt>Comments</dt><dd>{selectedOrder.comments || '-'}</dd></div>
                                 </dl>
                                 <div className="order-edit-actions"><button type="button" className="update-button" onClick={() => startEditing(selectedOrder)}>Update Order</button></div>

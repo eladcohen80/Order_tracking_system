@@ -118,6 +118,7 @@
 
 .product-actions {
   display: flex;
+  justify-self: end;
   gap: 0.45rem;
 }
 

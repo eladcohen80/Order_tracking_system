@@ -23,8 +23,7 @@ app.get('/health', (_req, res) => {
   res.json({status: 'ok'})
 })
 const startServer = async () => {
-  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'Pending'`;
-  await sql`UPDATE orders SET status = CASE WHEN received THEN 'Received' ELSE 'Pending' END WHERE status = 'Pending'`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending'`;
   app.listen(3000, () => {
     console.log('Server is running on port 3000');
   });

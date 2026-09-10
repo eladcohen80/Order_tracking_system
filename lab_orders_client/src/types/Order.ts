@@ -11,7 +11,6 @@ export type Order = {
   price: number,
   currency: string,
   total_price_nis: number,
-  received: boolean,
-  status: 'Pending' | 'Received' | 'Canceled',
+  status: 'received' | 'pending' | 'canceled',
   comments: string
 }

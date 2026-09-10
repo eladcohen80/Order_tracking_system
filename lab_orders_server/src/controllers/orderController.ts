@@ -136,7 +136,6 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       price,
       currency,
       total_price_nis,
-      received,
       status,
       comments
     } = req.body;
@@ -145,17 +144,16 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     const parsedAmount = amount !== '' && amount !== null && amount !== undefined ? Number(amount) : 0;
     const parsedPrice = price !== '' && price !== null && price !== undefined ? Number(price) : 0;
     const parsedTotalPriceNis = total_price_nis !== '' && total_price_nis !== null && total_price_nis !== undefined ? Number(total_price_nis) : 0;
-    const parsedStatus = status === 'Canceled' || status === 'Received' ? status : 'Pending';
-    const parsedReceived = parsedStatus === 'Received';
+    const parsedStatus = status === 'received' || status === 'canceled' ? status : 'pending';
 
     const result = await sql`
       INSERT INTO orders (
         order_date, description, cat_number, quote_number, po_number,
-        supplier, budget, amount, price, currency, total_price_nis, received, status, comments
+        supplier, budget, amount, price, currency, total_price_nis, status, comments
       ) VALUES (
         ${parsedOrderDate}, ${description || ''}, ${cat_number || ''}, ${quote_number || ''},
         ${po_number || ''}, ${supplier || ''}, ${budget || ''}, ${parsedAmount},
-        ${parsedPrice}, ${currency || ''}, ${parsedTotalPriceNis}, ${parsedReceived}, ${parsedStatus}, ${comments || ''}
+        ${parsedPrice}, ${currency || ''}, ${parsedTotalPriceNis}, ${parsedStatus}, ${comments || ''}
       ) RETURNING *
     `;
     await subtractOrderCostFromBudget(budget, parsedTotalPriceNis);
@@ -171,13 +169,13 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
 export const updateOrder = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { order_date, description, cat_number, quote_number, po_number, supplier, budget, amount, price, currency, total_price_nis, received, status, comments } = req.body;
+  const { order_date, description, cat_number, quote_number, po_number, supplier, budget, amount, price, currency, total_price_nis, status, comments } = req.body;
   try {
     if (!await isCurrentUserAdmin(req.user?.user_id)) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
-    const parsedStatus = status === 'Canceled' || status === 'Received' ? status : 'Pending';
-    const result = await sql`UPDATE orders SET order_date = ${order_date}, description = ${description}, cat_number = ${cat_number}, quote_number = ${quote_number}, po_number = ${po_number}, supplier = ${supplier}, budget = ${budget}, amount = ${amount}, price = ${price}, currency = ${currency}, total_price_nis = ${total_price_nis}, received = ${parsedStatus === 'Received'}, status = ${parsedStatus}, comments = ${comments} WHERE order_id = ${id} RETURNING *`;
+    const parsedStatus = status === 'received' || status === 'canceled' ? status : 'pending';
+    const result = await sql`UPDATE orders SET order_date = ${order_date}, description = ${description}, cat_number = ${cat_number}, quote_number = ${quote_number}, po_number = ${po_number}, supplier = ${supplier}, budget = ${budget}, amount = ${amount}, price = ${price}, currency = ${currency}, total_price_nis = ${total_price_nis}, status = ${parsedStatus}, comments = ${comments} WHERE order_id = ${id} RETURNING *`;
     if (result.length === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }

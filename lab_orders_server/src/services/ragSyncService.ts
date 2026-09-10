@@ -35,7 +35,7 @@ export async function syncOrderDocument(orderId: number): Promise<void> {
     }
 
     const order = orders[0]
-    const content = `Order date: ${order.order_date}. Description: ${order.description}. Catalog number: ${order.cat_number}. Quote number: ${order.quote_number}. PO number: ${order.po_number}. Supplier: ${order.supplier}. Budget: ${order.budget}. Quantity: ${order.amount}. Unit price: ${order.price} ${order.currency}. Total NIS: ${order.total_price_nis}. Received: ${order.received}. Comments: ${order.comments}.`
+    const content = `Order date: ${order.order_date}. Description: ${order.description}. Catalog number: ${order.cat_number}. Quote number: ${order.quote_number}. PO number: ${order.po_number}. Supplier: ${order.supplier}. Budget: ${order.budget}. Quantity: ${order.amount}. Unit price: ${order.price} ${order.currency}. Total NIS: ${order.total_price_nis}. Status: ${order.status}. Comments: ${order.comments}.`
     const vector = await embedText(content)
 
     await sql`UPDATE orders SET embedding_dimensions = ${vector}::vector WHERE order_id = ${orderId}`
