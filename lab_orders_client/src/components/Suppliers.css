@@ -164,13 +164,14 @@
 }
 
 .supplier-row button {
-  padding: 0.45rem 0.7rem;
+  padding: 0.3rem 0.5rem;
   border: 1px solid var(--border);
   border-radius: 5px;
   background: transparent;
   color: var(--text-h);
   cursor: pointer;
   font: inherit;
+  font-size: 0.78rem;
 }
 
 .supplier-row button:hover {

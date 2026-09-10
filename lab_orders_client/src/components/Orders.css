@@ -257,9 +257,10 @@
 .close-button {
   border: 1px solid var(--border);
   border-radius: 5px;
-  padding: 0.45rem 0.7rem;
+  padding: 0.3rem 0.5rem;
   cursor: pointer;
   font: inherit;
+  font-size: 0.78rem;
 }
 
 .details-button,
