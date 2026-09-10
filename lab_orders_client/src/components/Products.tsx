@@ -1,4 +1,4 @@
-import {getProducts} from "../services/productService";
+import {deleteProduct, getProducts, updateProduct} from "../services/productService";
 import { useEffect, useState } from "react";
 import type { Product } from "../types/Product";
 import './Products.css';
@@ -12,6 +12,7 @@ export default function Products() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
     const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     function getErrorMessage(error: any): string {
     if (error.response && error.response.data && error.response.data.message) {
@@ -73,6 +74,47 @@ export default function Products() {
         fetchProducts();
     }, []);
 
+    function handleEditChange(event: React.ChangeEvent<HTMLInputElement>) {
+        if (!editingProduct) {
+            return;
+        }
+
+        setEditingProduct({
+            ...editingProduct,
+            [event.target.name]: event.target.value,
+        });
+    }
+
+    async function handleEditSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (!editingProduct) {
+            return;
+        }
+
+        try {
+            const updatedProduct = await updateProduct(editingProduct);
+            setProducts((currentProducts) => currentProducts.map((product) => product.product_id === updatedProduct.product_id ? updatedProduct : product));
+            setEditingProduct(null);
+            setMessage('Product updated successfully');
+        } catch (error: any) {
+            setMessage(getErrorMessage(error));
+        }
+    }
+
+    async function handleDelete(productId: number) {
+        if (!window.confirm('Are you sure you want to delete this product?')) {
+            return;
+        }
+
+        try {
+            await deleteProduct(productId);
+            setProducts((currentProducts) => currentProducts.filter((product) => product.product_id !== productId));
+            setMessage('Product deleted successfully');
+        } catch (error: any) {
+            setMessage(getErrorMessage(error));
+        }
+    }
+
     return (
         <div className="products-container">
             <div className="list-title-row">
@@ -98,6 +140,7 @@ export default function Products() {
                         <button type="button" onClick={() => handleSort('cat_number')}>Catalog Number{getSortIndicator('cat_number')}</button>
                         <button type="button" onClick={() => handleSort('supplier')}>Supplier{getSortIndicator('supplier')}</button>
                         <button type="button" onClick={() => handleSort('price_in_last_order')}>Last Price/Unit{getSortIndicator('price_in_last_order')}</button>
+                        <span>Actions</span>
                     </div>
                     {sortedProducts.map((product) => (
                         <div className="product-row" key={product.product_id}>
@@ -105,8 +148,39 @@ export default function Products() {
                             <span>{product.cat_number || '-'}</span>
                             <span>{product.supplier || '-'}</span>
                             <span>{product.price_in_last_order || '-'}</span>
+                            <span className="product-actions">
+                                <button type="button" onClick={() => setEditingProduct({ ...product })}>Edit</button>
+                                <button type="button" onClick={() => handleDelete(product.product_id!)}>Delete</button>
+                            </span>
                         </div>
                     ))}
+                </div>
+            )}
+            {editingProduct && (
+                <div className="product-modal-backdrop" onClick={() => setEditingProduct(null)}>
+                    <form className="product-edit-modal" onSubmit={handleEditSubmit} onClick={(event) => event.stopPropagation()}>
+                        <h2>Edit Product</h2>
+                        <label>
+                            Product Name
+                            <input name="product_name" value={editingProduct.product_name} onChange={handleEditChange} required />
+                        </label>
+                        <label>
+                            Catalog Number
+                            <input name="cat_number" value={editingProduct.cat_number} onChange={handleEditChange} />
+                        </label>
+                        <label>
+                            Supplier
+                            <input name="supplier" value={editingProduct.supplier} onChange={handleEditChange} />
+                        </label>
+                        <label>
+                            Last Price/Unit
+                            <input name="price_in_last_order" value={editingProduct.price_in_last_order ?? ''} onChange={handleEditChange} />
+                        </label>
+                        <div className="product-edit-actions">
+                            <button type="button" onClick={() => setEditingProduct(null)}>Cancel</button>
+                            <button type="submit">Update</button>
+                        </div>
+                    </form>
                 </div>
             )}
         </div>

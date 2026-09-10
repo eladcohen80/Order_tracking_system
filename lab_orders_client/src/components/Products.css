@@ -61,7 +61,7 @@
 .products-header,
 .product-row {
   display: grid;
-  grid-template-columns: minmax(260px, 2.2fr) minmax(110px, 0.9fr) minmax(110px, 0.9fr) minmax(80px, 0.5fr);
+  grid-template-columns: minmax(260px, 2.2fr) minmax(110px, 0.9fr) minmax(110px, 0.9fr) minmax(80px, 0.5fr) minmax(140px, 0.9fr);
   gap: 0.75rem;
   align-items: center;
   text-align: left;
@@ -113,6 +113,92 @@
   color: var(--text-h);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.product-actions {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.product-actions button,
+.product-edit-actions button {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.product-actions button:hover,
+.product-edit-actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.product-actions button:last-child:hover {
+  border-color: #b42318;
+  background: #b42318;
+  color: #fff;
+}
+
+.product-modal-backdrop {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.product-edit-modal {
+  display: grid;
+  width: min(460px, 100%);
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.product-edit-modal h2 {
+  margin: 0;
+  color: var(--text-h);
+}
+
+.product-edit-modal label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-h);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.product-edit-modal input {
+  min-height: 2.35rem;
+  box-sizing: border-box;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.product-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.product-edit-actions button[type='submit'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
 }
 
 @media (max-width: 760px) {

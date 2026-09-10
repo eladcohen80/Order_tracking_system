@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import sql from '../db';
 import { AuthRequest } from "../middleware/authMiddleware";
+import { syncProductDocument } from "../services/ragSyncService";
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -18,9 +19,9 @@ export const getProducts = async (req: Request, res: Response) => {
 export const getProductById = async (req: Request, res: Response) => {
   const { id } = req.params;
     try {
-    const result = await sql`SELECT * FROM suppliers WHERE supplier_id = ${id}`;
+    const result = await sql`SELECT * FROM products WHERE product_id = ${id}`;
     if (result.length === 0) {
-      return res.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: 'Product not found' });
     }
     res.json(result[0]);
     } catch (error) {
@@ -31,12 +32,13 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: AuthRequest, res: Response) => {
     try {
-    const { name, contact_person, email, phone } = req.body;
+    const { product_name, cat_number, supplier, price_in_last_order } = req.body;
     const result = await sql`
-      INSERT INTO suppliers (name, contact_person, email, phone)
-      VALUES (${name}, ${contact_person}, ${email}, ${phone})
+      INSERT INTO products (product_name, cat_number, supplier, price_in_last_order)
+      VALUES (${product_name}, ${cat_number || ''}, ${supplier || ''}, ${price_in_last_order || null})
         RETURNING *;
     `;
+    await syncProductDocument(result[0].product_id);
     res.status(201).json(result[0]);
   } catch (error) {
     console.error(error);
@@ -46,18 +48,19 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
 
 export const updateProduct = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { name, contact_person, email, phone } = req.body;  
+  const { product_name, cat_number, supplier, price_in_last_order } = req.body;
   const parsedId = Number(id);
   try {
     const result = await sql`
-      UPDATE suppliers
-      SET name = ${name}, contact_person = ${contact_person}, email = ${email}, phone = ${phone}
-        WHERE supplier_id = ${parsedId}
+      UPDATE products
+      SET product_name = ${product_name}, cat_number = ${cat_number || ''}, supplier = ${supplier || ''}, price_in_last_order = ${price_in_last_order || null}
+        WHERE product_id = ${parsedId}
         RETURNING *;
     `;
     if (result.length === 0) {
-      return res.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: 'Product not found' });
     }
+    await syncProductDocument(parsedId);
     res.json(result[0]);
   } catch (error) {
     console.error(error);
@@ -70,14 +73,14 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
   const parsedId = Number(id);
     try {
     const result = await sql`
-      DELETE FROM suppliers
-      WHERE supplier_id = ${parsedId}
+      DELETE FROM products
+      WHERE product_id = ${parsedId}
         RETURNING *;
     `;
     if (result.length === 0) {
-      return res.status(404).json({ error: 'Supplier not found' });
+      return res.status(404).json({ error: 'Product not found' });
     }
-    res.json({ message: 'Supplier deleted successfully' });
+    res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
