@@ -47,6 +47,18 @@ const addProductIfMissing = async (description: string, catNumber: string, suppl
   `;
 };
 
+const subtractOrderCostFromBudget = async (budgetName: string, totalPriceNis: number) => {
+  if (!budgetName?.trim() || totalPriceNis === 0) {
+    return;
+  }
+
+  await sql`
+    UPDATE budgets
+    SET budget_balance = budget_balance - ${totalPriceNis}
+    WHERE budget_name = ${budgetName.trim()}
+  `;
+};
+
 export const getOrders = async (req: Request, res: Response) => {
   try {
     const result = await sql`SELECT * FROM orders`;
@@ -124,6 +136,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
         ${parsedPrice}, ${currency || ''}, ${parsedTotalPriceNis}, ${parsedReceived}, ${parsedStatus}, ${comments || ''}
       ) RETURNING *
     `;
+    await subtractOrderCostFromBudget(budget, parsedTotalPriceNis);
     await addProductIfMissing(description, cat_number, supplier, parsedPrice, currency);
     await syncOrderDocument(result[0].order_id);
     await syncProductDocumentByKey(description, cat_number, supplier);
