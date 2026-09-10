@@ -61,7 +61,7 @@
 .suppliers-header,
 .supplier-row {
   display: grid;
-  grid-template-columns: minmax(130px, 1.2fr) minmax(130px, 1fr) minmax(180px, 1.4fr) minmax(110px, 0.9fr) minmax(230px, 1.2fr);
+  grid-template-columns: minmax(130px, 1.2fr) minmax(130px, 1fr) minmax(180px, 1.4fr) minmax(110px, 0.9fr) max-content;
   gap: 0.75rem;
   align-items: center;
   text-align: left;
