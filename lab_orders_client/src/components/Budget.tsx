@@ -12,6 +12,7 @@ export default function Budgets() {
     const [sortDirection, setSortDirection] = useState<SortDirection>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
 
     function getErrorMessage(error: any): string {
@@ -58,6 +59,7 @@ export default function Budgets() {
     });
 
     async function fetchBudgets() {
+        setIsLoading(true);
         try {
             const data = await getBudgets();
             setBudgets(data);
@@ -65,6 +67,8 @@ export default function Budgets() {
         } catch (error: any) {
             console.error('Error fetching budgets:', error);
             setMessage(getErrorMessage(error));
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -133,7 +137,11 @@ export default function Budgets() {
                 </label>
             </div>
             {message && <p className="message">{message}</p>}
-            {budgets.length === 0 && !message ? (
+            {isLoading ? (
+                <p className="loading-state" role="status" aria-live="polite">
+                    Loading<span className="loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                </p>
+            ) : budgets.length === 0 && !message ? (
                 <p>No budgets available.</p>
             ) : filteredBudgets.length === 0 ? (
                 <p>No budgets match your search.</p>

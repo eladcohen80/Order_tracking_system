@@ -19,6 +19,7 @@ export default function Orders() {
     const [exportFromDate, setExportFromDate] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
 
     function getErrorMessage(error: unknown, fallback: string) {
         return error instanceof Error ? error.message : fallback;
@@ -173,6 +174,7 @@ export default function Orders() {
     }
 
     useEffect(() => {
+        setIsLoading(true);
         void getOrders()
             .then((data) => {
                 setOrders(data);
@@ -181,7 +183,8 @@ export default function Orders() {
             .catch((error: unknown) => {
                 setMessage(getErrorMessage(error, 'Failed to load orders.'));
                 setOrders([]);
-            });
+            })
+            .finally(() => setIsLoading(false));
     }, []);
 
     return (
@@ -222,7 +225,11 @@ export default function Orders() {
                 </div>
             </div>
             {message && <p className="error-message">{message}</p>}
-            {filteredOrders.length === 0 && !message ? (
+            {isLoading ? (
+                <p className="loading-state" role="status" aria-live="polite">
+                    Loading<span className="loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                </p>
+            ) : filteredOrders.length === 0 && !message ? (
                 <p className="no-orders">No orders match the selected filters.</p>
             ) : (
                 <div className="orders-list">

@@ -12,6 +12,7 @@ export default function Products() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
     const [searchTerm, setSearchTerm] = useState('');
   const [message, setMessage] = useState('');
+        const [isLoading, setIsLoading] = useState(true);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     function getErrorMessage(error: any): string {
@@ -60,6 +61,7 @@ export default function Products() {
         return 0;
     });
     async function fetchProducts() {
+        setIsLoading(true);
         try {
             const data = await getProducts('');
             setProducts(data);
@@ -67,6 +69,8 @@ export default function Products() {
         } catch (error: any) {
             console.error('Error fetching products:', error);
             setMessage(getErrorMessage(error));
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -129,7 +133,11 @@ export default function Products() {
                 </label>
             </div>
             {message && <p className="error-message">{message}</p>}
-            {products.length === 0 && !message ? (
+            {isLoading ? (
+                <p className="loading-state" role="status" aria-live="polite">
+                    Loading<span className="loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                </p>
+            ) : products.length === 0 && !message ? (
                 <p>No products found.</p>
             ) : filteredProducts.length === 0 ? (
                 <p>No products match your search.</p>

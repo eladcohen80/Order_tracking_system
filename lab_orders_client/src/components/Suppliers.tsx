@@ -14,6 +14,7 @@ export default function Suppliers() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [message, setMessage] = useState('');
+        const [isLoading, setIsLoading] = useState(true);
 
   function getErrorMessage(error: any): string {
     if (error.response && error.response.data && error.response.data.message) {
@@ -62,6 +63,7 @@ export default function Suppliers() {
         return 0;
     });
     async function fetchSuppliers() {
+        setIsLoading(true);
         try {
             const data = await getSuppliers();
             setSuppliers(data);
@@ -69,6 +71,8 @@ export default function Suppliers() {
         } catch (error: any) {
             console.error('Error fetching suppliers:', error);
             setMessage(getErrorMessage(error));
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -138,7 +142,11 @@ export default function Suppliers() {
                 </label>
             </div>
             {message && <p className="error-message">{message}</p>}
-            {suppliers.length === 0 && !message ? (
+            {isLoading ? (
+                <p className="loading-state" role="status" aria-live="polite">
+                    Loading<span className="loading-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                </p>
+            ) : suppliers.length === 0 && !message ? (
                 <p>No suppliers found. Please add a supplier.</p>
             ) : filteredSuppliers.length === 0 ? (
                 <p>No suppliers match your search.</p>
