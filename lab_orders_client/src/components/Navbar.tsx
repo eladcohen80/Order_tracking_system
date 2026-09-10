@@ -33,7 +33,7 @@ export default function Navbar({ isDarkMode, onToggleTheme }: NavbarProps) {
         <Link to="/" className="nav-link" style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Home</Link>
       </div>
       <div className="navbar-links">
-        <div className="nav-dropdown">
+        <div className="nav-dropdown" onMouseEnter={() => setOpenMenu('orders')} onMouseLeave={closeMenu}>
           <button type="button" className="nav-menu-button" onClick={() => toggleMenu('orders')} aria-expanded={openMenu === 'orders'} aria-haspopup="menu">
             Orders <span className="nav-menu-arrow" aria-hidden="true" />
           </button>
@@ -44,7 +44,7 @@ export default function Navbar({ isDarkMode, onToggleTheme }: NavbarProps) {
             </div>
           )}
         </div>
-        <div className="nav-dropdown">
+        <div className="nav-dropdown" onMouseEnter={() => setOpenMenu('suppliers')} onMouseLeave={closeMenu}>
           <button type="button" className="nav-menu-button" onClick={() => toggleMenu('suppliers')} aria-expanded={openMenu === 'suppliers'} aria-haspopup="menu">
             Suppliers <span className="nav-menu-arrow" aria-hidden="true" />
           </button>
@@ -55,7 +55,7 @@ export default function Navbar({ isDarkMode, onToggleTheme }: NavbarProps) {
             </div>
           )}
         </div>
-        <div className="nav-dropdown">
+        <div className="nav-dropdown" onMouseEnter={() => setOpenMenu('budgets')} onMouseLeave={closeMenu}>
           <button type="button" className="nav-menu-button" onClick={() => toggleMenu('budgets')} aria-expanded={openMenu === 'budgets'} aria-haspopup="menu">
             Budgets <span className="nav-menu-arrow" aria-hidden="true" />
           </button>
