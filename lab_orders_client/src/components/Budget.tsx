@@ -12,6 +12,7 @@ export default function Budgets() {
     const [sortDirection, setSortDirection] = useState<SortDirection>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [message, setMessage] = useState('');
+    const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
 
     function getErrorMessage(error: any): string {
         if (error.response && error.response.data && error.response.data.message) {
@@ -75,10 +76,31 @@ export default function Budgets() {
         try {
             const updated = await updateBudget(updatedBudget);
             setBudgets(prevBudgets => prevBudgets.map(budget => budget.budget_id === updated.budget_id ? updated : budget));
+            setEditingBudget(null);
             setMessage('Budget updated successfully');
         } catch (error: any) {
             console.error('Error updating budget:', error);
             setMessage(getErrorMessage(error));
+        }
+    }
+
+    function handleEditChange(event: React.ChangeEvent<HTMLInputElement>) {
+        if (!editingBudget) {
+            return;
+        }
+
+        setEditingBudget({
+            ...editingBudget,
+            [event.target.name]: event.target.name === 'budget_balance'
+                ? Number(event.target.value)
+                : event.target.value,
+        });
+    }
+
+    function handleEditSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (editingBudget) {
+            void handleUpdateBudget(editingBudget);
         }
     }
 
@@ -130,13 +152,46 @@ export default function Budgets() {
                                 <td>{budget.budget_name}</td>
                                 <td>{budget.budget_balance}</td>
                                 <td>
-                                    <button onClick={() => handleUpdateBudget(budget)}>Edit</button>
+                                    <button onClick={() => setEditingBudget({ ...budget })}>Edit</button>
                                     <button onClick={() => handleDeleteBudget(budget.budget_id!)}>Delete</button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>    
                 </table>
+            )}
+            {editingBudget && (
+                <div className="budget-modal-backdrop" onClick={() => setEditingBudget(null)}>
+                    <form className="budget-edit-modal" onSubmit={handleEditSubmit} onClick={(event) => event.stopPropagation()}>
+                        <h2>Update Budget</h2>
+                        <div className="form-group">
+                            <label htmlFor="edit-budget-name">Budget Name</label>
+                            <input
+                                id="edit-budget-name"
+                                name="budget_name"
+                                type="text"
+                                value={editingBudget.budget_name}
+                                onChange={handleEditChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="edit-budget-balance">Budget Balance</label>
+                            <input
+                                id="edit-budget-balance"
+                                name="budget_balance"
+                                type="number"
+                                value={editingBudget.budget_balance}
+                                onChange={handleEditChange}
+                                required
+                            />
+                        </div>
+                        <div className="budget-edit-actions">
+                            <button type="button" onClick={() => setEditingBudget(null)}>Cancel</button>
+                            <button type="submit">Update</button>
+                        </div>
+                    </form>
+                </div>
             )}
         </div>
     );

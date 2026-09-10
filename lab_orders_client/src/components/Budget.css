@@ -155,6 +155,77 @@
   color: #fff;
 }
 
+.budget-modal-backdrop {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.budget-edit-modal {
+  display: grid;
+  width: min(460px, 100%);
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.budget-edit-modal h2 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 1.35rem;
+}
+
+.budget-edit-modal .form-group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.budget-edit-modal label {
+  color: var(--text-h);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.budget-edit-modal input {
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.budget-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.budget-edit-actions button {
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+  font: inherit;
+}
+
+.budget-edit-actions button[type='submit'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
 @media (max-width: 620px) {
   .budget-container {
     padding: 1rem;
