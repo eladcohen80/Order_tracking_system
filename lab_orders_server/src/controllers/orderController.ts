@@ -59,6 +59,18 @@ const subtractOrderCostFromBudget = async (budgetName: string, totalPriceNis: nu
   `;
 };
 
+const restoreOrderCostToBudget = async (budgetName: string, totalPriceNis: number) => {
+  if (!budgetName?.trim() || totalPriceNis === 0) {
+    return;
+  }
+
+  await sql`
+    UPDATE budgets
+    SET budget_balance = budget_balance + ${totalPriceNis}
+    WHERE budget_name = ${budgetName.trim()}
+  `;
+};
+
 export const getOrders = async (req: Request, res: Response) => {
   try {
     const result = await sql`SELECT * FROM orders`;
@@ -180,6 +192,11 @@ export const deleteOrder = async (req: AuthRequest, res: Response) => {
     if (result.length === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
+    const deletedOrder = result[0];
+    await restoreOrderCostToBudget(
+      deletedOrder.budget,
+      Number(deletedOrder.total_price_nis) || 0
+    );
     await deleteDocumentBySourceKey(`order:${id}`);
     res.json({ message: 'Order deleted successfully' });
     } catch (error) {
