@@ -52,11 +52,16 @@ const subtractOrderCostFromBudget = async (budgetName: string, totalPriceNis: nu
     return;
   }
 
-  await sql`
+  const updatedBudgets = await sql`
     UPDATE budgets
     SET budget_balance = budget_balance - ${totalPriceNis}
-    WHERE budget_name = ${budgetName.trim()}
+    WHERE LOWER(TRIM(budget_name)) = LOWER(TRIM(${budgetName}))
+    RETURNING budget_id
   `;
+
+  if (updatedBudgets.length === 0) {
+    throw new Error(`Budget not found: ${budgetName}`);
+  }
 };
 
 const restoreOrderCostToBudget = async (budgetName: string, totalPriceNis: number) => {
@@ -64,11 +69,16 @@ const restoreOrderCostToBudget = async (budgetName: string, totalPriceNis: numbe
     return;
   }
 
-  await sql`
+  const updatedBudgets = await sql`
     UPDATE budgets
     SET budget_balance = budget_balance + ${totalPriceNis}
-    WHERE budget_name = ${budgetName.trim()}
+    WHERE LOWER(TRIM(budget_name)) = LOWER(TRIM(${budgetName}))
+    RETURNING budget_id
   `;
+
+  if (updatedBudgets.length === 0) {
+    throw new Error(`Budget not found: ${budgetName}`);
+  }
 };
 
 export const getOrders = async (req: Request, res: Response) => {
